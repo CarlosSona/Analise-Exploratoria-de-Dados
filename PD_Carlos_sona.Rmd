@@ -1,0 +1,202 @@
+---
+title: "PD_Analise_exp_Dados"
+author: "Carlos Sona"
+date: "`r Sys.Date()`"
+output:
+  pdf_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Relatório em R Markdown
+
+###1.	O relatório final deve ser apresentado utilizando RMarkdown. Nesse relatório devem haver:
+###a.	imagens estáticas ("prints" de tela, imagens da internet - com a devida fonte mencionada - ou figuras criadas pelo aluno fora do ambiente do R);
+###b.	imagens geradas através do ambiente R, particularmente com a biblioteca ggplot;
+###c.	links clicáveis (como fontes e referências).
+
+###2.	Escolha uma base de dados para realizar esse projeto. Essa base de dados será utilizada durante toda sua análise. Essa base necessita ter 4 (ou mais) variáveis de interesse, onde todas são numéricas (confira com o professor a possibilidade de utilização de dados categóricos). Observe que é importante que haja dados faltantes em pelo menos uma variável para executar esse projeto. Caso você tenha dificuldade para escolher uma base, o professor da disciplina irá designar para você. Explique qual o motivo para a escolha dessa base e aponte os resultados esperados através da análise.
+
+Base importada via import dataset
+```{r}
+# Carregando o pacote readxl
+library(readxl)
+dados <- read_excel("D:/MBA/MBA/04 - Analise Exploratoria de Dados/Projeto/DB/income_democracy.xlsx", sheet = 1)
+summary(dados)
+```
+
+A base escolhida foi um subset do arquivo de dados Income_Democracy contém um conjunto de dados em painel para 195 países nos anos de 1960, 1965, ... 2000. Os dados foram fornecidos pelo Professor Daron Acemoglu e são um subconjunto dos dados utilizados em seu artigo com Simon Johnson, James Robinson e Pierre Yared, "Renda e Democracia", American Economic Review, 2008, 98:3: 808-842.
+
+Nome da Variável Descrição
+country nome do país
+year ano
+dem_ind índice de democracia
+log_gdppc logaritmo do PIB real per capita
+log_pop logaritmo da população
+age_1 fração da população com idade de 0 a 14 anos
+age_2 fração da população com idade entre 15 e 29 anos
+age_3 fração da população com idade entre 30 e 44 anos
+age_4 fração da população com idade entre 45 e 59 anos
+age_5 fração da população com idade de 60 anos ou mais
+educ anos médios de educação para adultos (25 anos ou mais)
+age_median idade mediana
+code código do país
+
+Notas: As variáveis de renda e demográficas têm um atraso de cinco anos. Por exemplo, log_gdppc para o ano = 1965 é o logaritmo do PIB per capita em 1960.
+
+Foi uma base escolhida com propósitos de treinamento para demonstrar conhecimentos adquiridos na disciplina, dela foram excluídos os dados de: 
+Afghanistan, Albania, Andorra, Armenia, Bangladesh, Angola, Antigua, Azerbaijan, Bahrain, Bahamas, Bosnia and Herzegovina, Belarus, Belize, Benin, Brunei, Burundi, Burkina Faso, Bhutan, Bulgaria, Cote d'Ivoire, Congo, Rep., Comoros, Cape Verde, Cuba, Czech Republic, Czechoslovakia, Croatia, Central African Republic, Djibouti, Eritrea, Egypt, Arab Rep., Gabon, Georgia, Guinea, Gambia, The, Guinea-Bissau, Equatorial Guinea, Haiti, Iraq, Kyrgyz Republic, Cambodia, Lao PDR, Lebanon, Liberia, Mozambique, Kazakhstan, Kuwait, Libya, St. Lucia, Lithuania, Luxembourg, Latvia, Morocco, Moldova, Madagascar, Maldives, Macedonia, FYR, Mali, Malta, Myanmar, Mongolia, Mauritania, Namibia, Nigeria, Oman, Pakistan, Papua New Guinea, Poland, Korea, Dem. Rep., Qatar, Romania, Russia, Rwanda, Saudi Arabia, Sudan, Solomon Islands, Somalia, Sao Tome and Principe, Suriname, Slovakia, Slovenia, Seychelles, Syrian Arab Republic, Chad, Togo, Tajikistan, Turkmenistan, Tonga, Tanzania, Uganda, Ukraine, USSR, Uzbekistan, St. Vincent and the Grenadines, Vietnam, Vanuatu, Yemen, Yugoslavia - post 1991, Congo, Dem. Rep., Germany, Germany East, Germany West, Dominica, Estonia, Ethiopia, Grenada, Kiribati, St Kittis and Nevis, Korea, Liechtenstein, United Arab Emirates, Vietnam e Yemen. 
+
+Foram países que possuíam muitos dados faltantes em muitas variáveis, onde também utilizei o critério dos países terem mais de 6 observações para não poluir a análise. Dessa forma, foram escolhidos os seguintes países para compor o subset um total de 77 países: 
+Argentina, Australia, Austria, Belgium, Bolivia, Brazil, Barbados, Botswana, Canada, Switzerland, Chile, China, Cameroon, Colombia, Costa Rica, Cyprus, Denmark, Dominican Republic, Algeria, Ecuador, Spain, Finland, Fiji, France, United Kingdom, Ghana, Greece, Guatemala, Guyana, Honduras, Hungary, Indonesia, India, Ireland, Iran, Iceland, Israel, Italy, Jamaica, Jordan, Japan, Kenya, Korea, Rep., Sri Lanka, Lesotho, Mexico, Mauritius, Malawi, Malaysia, Niger, Nicaragua, Netherlands, Norway, Nepal, New Zealand, Panama, Peru, Philippines, Portugal, Paraguay, Senegal, Singapore, Sierra Leone, El Salvador, Sweden, Swaziland, Thailand, Trinidad and Tobago, Tunisia, Turkey, Taiwan, Uruguay, United States, Venezuela, RB, South Africa, Zambia, Zimbabwe.
+
+ 
+
+###3.	Utilizando o pacote summarytools (função descr), descreva estatisticamente a sua base de dados.
+
+```{r}
+library(summarytools)
+descr(dados)
+```
+### 4.	Crie um gráfico com a matriz de espalhamento (scatter matrix plot) para sua base de dados. Através de investigação visual, quais são as variáveis mais correlacionadas. Apresente o gráfico e justifique.
+
+```{r}
+#install.packages(c("ggplot2", "grid", "gridExtra", "plyr", "reshape2", "GGally"))
+library(readxl)
+library(GGally)
+# Matriz de espalhamento
+ggpairs(dados, columns = c("dem_ind", "log_gdppc", "log_pop", "educ", "age_median"))
+```
+Através do gráfico de matriz de espalhamento, é possível visualizar a relação entre cada par de variáveis, bem como o histograma e o gráfico de densidade de cada variável na diagonal do gráfico. Foi possível tirar as seguintes conclusões a partir do gráfico:
+
+A variável de índice de democracia (dem_ind) tem uma correlação positiva com log_gdppc e educ, o que sugere que países com maior PIB per capita e maior média de anos de educação tendem a ter um índice de democracia mais elevado.
+
+A variável de anos médios de educação para adultos (educ) e log-gdppc tem uma correlação positiva com a idade mediana (age_median), o que sugere que países com uma população mais velha tendem a ter uma média de anos de educação mais elevada e com maior PIB per capita.
+
+
+### 5.	Sobre a normalidade das variáveis:
+### 5a.	Descreva o que é uma distribuição normal;
+
+Uma distribuição normal é um tipo de distribuição de probabilidade que apresenta uma forma de sino simétrica. Essa distribuição é caracterizada por ter a média, mediana e moda com valores iguais, e é amplamente utilizada em análises estatísticas e em muitas outras áreas, pois muitos fenômenos naturais seguem esse tipo de distribuição. Basicamente, a maior parte dos valores na distribuição normal se concentra perto da média, e a frequência de valores diminui à medida que se afasta da média, seguindo um padrão conhecido como curva normal. 
+### 5b.	Crie um histograma para cada variável da sua base de dados. Justifique a escolha do número de bins para seu trabalho. (usando o pacote ggplot);
+
+```{r}
+library(ggplot2)
+
+# Histograma da variável dem_ind
+ggplot(dados, aes(x = dem_ind)) +
+  geom_histogram(bins = 10, fill = "blue", alpha = 0.5) +
+  labs(title = "Distribuição da Variável Dem_ind")
+
+# Histograma da variável log_gdppc
+ggplot(dados, aes(x = log_gdppc)) +
+  geom_histogram(bins = 16, fill = "red", alpha = 0.5) +
+  labs(title = "Distribuição da Variável log_gdppc")
+
+# Histograma da variável log_pop
+ggplot(dados, aes(x = log_pop)) +
+  geom_histogram(bins = 21, fill = "green", alpha = 0.5) +
+  labs(title = "Distribuição da Variável log_pop")
+
+# Histograma da variável educ
+ggplot(dados, aes(x = educ)) +
+  geom_histogram(bins = 7, fill = "orange", alpha = 0.5) +
+  labs(title = "Distribuição da Variável educ")
+
+# Histograma da variável age_median
+ggplot(dados, aes(x = age_median)) +
+  geom_histogram(bins = 11, fill = "gray", alpha = 0.5) +
+  labs(title = "Distribuição da Variável age_median")
+```
+
+### 5c.	Crie um gráfico Q-Q para cada variável de sua base de dados. (use as funções presentes no pacote ggpubr);
+
+```{r}
+#install.packages("ggpubr")
+library(ggpubr)
+
+# Gráfico Q-Q da variável dem_ind
+ggqqplot(dados$dem_ind, color = "blue", 
+         main = "Gráfico Q-Q da Variável dem_ind")
+
+# Gráfico Q-Q da variável log_gdppc
+ggqqplot(dados$log_gdppc, color = "red", 
+         main = "Gráfico Q-Q da Variável log_gdppc")
+
+# Gráfico Q-Q da variável log_pop
+ggqqplot(dados$log_pop, color = "green", 
+         main = "Gráfico Q-Q da Variável log_pop")
+
+# Gráfico Q-Q da variável educ
+ggqqplot(dados$educ, color = "orange", 
+         main = "Gráfico Q-Q da Variável educ")
+
+# Gráfico Q-Q da variável age_median
+ggqqplot(dados$age_median, color = "gray", 
+         main = "Gráfico Q-Q da Variável age_median")
+```
+Se os pontos no gráfico estiverem próximos da linha diagonal, indica que os dados estão próximos de uma distribuição normal. Se os pontos estiverem muito distantes da diagonal, indica que os dados não seguem uma distribuição normal.
+
+### 5d.	Execute um teste de normalidade Shapiro-Wilk;
+
+```{r}
+# Aplicando o teste de normalidade Shapiro-Wilk nas variáveis acima
+shapiro.test(dados$dem_ind)
+shapiro.test(dados$log_gdppc)
+shapiro.test(dados$log_pop)
+shapiro.test(dados$educ)
+shapiro.test(dados$age_median)
+```
+Nos casos que o valor-p é menor que 0.05 podemos rejeitar a hipótese nula de que a distribuição não é normal, em favor da hipótese alternativa de que a distribuição se aproxima de uma normal. 
+
+### 5e.	Baseado nos itens anteriores, é possível afirmar que algumas das variáveis se aproximam de uma distribuição normal? Justifique.
+
+Com base nos histogramas e gráficos Q-Q gerados, além dos testes de normalidade Shapiro-Wilk, pude inferir que a variável "log_pop" é a que mais se aproximaria de uma distribuição normal, pois apresenta simetria nos histogramas e uma boa aderência à linha de normalidade nos gráficos Q-Q. Porém, com base no resultado auferido no teste Saphiro-Wilk para esta variável, valor de W é 0.9849 e o p-valor é 9.484e-06 (ou 0.000009484). Um valor de p menor que 0,05 (ou 5%) indica que há evidências estatisticamente significativas de que os dados não seguem uma distribuição normal.
+
+Nesse caso, como o p-valor é muito menor que 0,05, pude concluir que os dados não seguem uma distribuição normal com um alto grau de confiança estatística. Isso significa que as suposições de normalidade subjacentes a muitas técnicas estatísticas podem não ser satisfeitas, e outras abordagens podem ser mais apropriadas para analisar esses dados.
+
+### 6.	Qualidade de dados tem sido um dos temas mais abordados nos projetos de estruturação em data analytics, sendo um dos principais indicadores do nível de maturidade das organizações. Um dos problemas mais comuns de qualidade é relacionado à completude de dados. Em suas palavras, como é definido completude? Qual o impacto em uma análise exploratória de dados?
+
+Completude de dados é a medida em que todos os dados esperados ou necessários estão presentes em uma amostra, conjunto de dados ou base de dados. Em outras palavras, trata-se da presença de valores em todas as variáveis ou campos que deveriam estar presentes.
+
+O impacto da incompletude dos dados na análise exploratória de dados pode ser significativo, uma vez que a falta de informações pode levar a interpretações errôneas ou conclusões incorretas. Além disso, a falta de dados pode levar a problemas em análises estatísticas, como viés e perda de poder estatístico.
+
+###7.	Qual a completude para cada uma das variáveis do seu banco de dados?
+
+```{r}
+completude <- colMeans(!is.na(dados))
+completude
+```
+###8.	Realize uma operação de imputação de dados usando o pacote MICE.
+
+```{r}
+# Instalando e carregando o MICE
+#install.packages("mice")
+library(mice)
+
+# Realizar a imputação de dados
+dados_imputados <- mice(dados, m = 10, maxit = 50, method = "pmm", seed = 123)
+
+# combinar os dados imputados em um único conjunto de dados para análise
+dados_imputados_completos <- complete(dados_imputados)
+
+# Gravar tabela "dados"
+write.csv(dados_imputados_completos, file = "D:/MBA/MBA/04 - Analise Exploratoria de Dados/Projeto/DB/dados.csv", row.names = FALSE)
+```
+
+###9.	Crie um dashboard Shiny onde seja possível selecionar (tire um print-screen da tela final do sistema):
+###a.	uma variável da sua base de dados e um gráfico em linha seja mostrado na tela;
+###b.	escolher a cor da linha do gráfico;
+###c.	selecionar o limite inferior e superior do eixo X do gráfico;
+###d.	selecionar o limite inferior e superior do eixo Y do gráfico.
+
+![](D:/MBA/MBA/04 - Analise Exploratoria de Dados/Projeto/shiny.png)
+![](D:/MBA/MBA/04 - Analise Exploratoria de Dados/Projeto/shiny2.png)
+
+
+###10.	Disponibilize os códigos (RMarkdown e Shiny) em uma plataforma de compartilhamento de códigos (sugestão GitHub)
+Endereço: https://github.com/CarlosSona/Analise-Exploratoria-de-Dados.git
+
